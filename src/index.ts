@@ -1,9 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { graphqlHTTP } from 'express-graphql';
-import { getProducts } from './utils/shopifyClient';
 import root from './resolvers/shopifyResolver';
-import  schema  from './schemas/shopifySchema';
+import schema from './schemas/shopifySchema';
+import ngrok from 'ngrok';
 
 dotenv.config();
 
@@ -16,6 +16,10 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+
+app.listen(PORT, async () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}/graphql`);
+
+  const url = await ngrok.connect(Number(PORT));
+  console.log(`ngrok URL pública: ${url}/graphql`);
 });
