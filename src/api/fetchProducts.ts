@@ -73,4 +73,3 @@ export const fetchProducts = async ({ first = 20, after = null, tags = [], title
     throw new Error("Failed to fetch products");
   }
 };
-

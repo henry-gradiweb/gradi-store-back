@@ -28,7 +28,7 @@ app.get("/api/products", async (req, res) => {
 });
 
 app.post("/api/update-variant-stock", async (req, res) => {
-  const { variantId, newStock, locationId } = req.body;
+  const { variantId, newStock, locationId, name, reason } = req.body;
 
   if (!variantId.startsWith("gid://shopify/ProductVariant/")) {
     return res.status(400).json({ error: "Invalid variant ID format. Must be a ProductVariant ID." });
@@ -39,23 +39,22 @@ app.post("/api/update-variant-stock", async (req, res) => {
       return res.status(400).json({ error: "Invalid input: variantId, newStock, and locationId are required." });
     }
 
-    const result = await updateVariantStock({ variantId, newStock, locationId });
+    const result = await updateVariantStock({ variantId, newStock, locationId, name, reason });
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error });
   }
 });
 
-
 app.post("/api/create-discount", async (req, res) => {
-  const { discountCode, discountType, discountValue, tag } = req.body;
+  const { discountCode, discountCodeTitle, discountType, discountValue } = req.body;
 
-  if (!discountCode || !discountType || discountValue === undefined || !Array.isArray(tag) || tag.length === 0) {
+  if (!discountCode || !discountType || discountValue === undefined) {
     return res.status(400).json({ error: "Invalid input: All fields are required and tag must be a non-empty array." });
   }
 
   try {
-    const result = await createDiscountCode({ discountCode, discountType, discountValue, tag });
+    const result = await createDiscountCode({ discountCode, discountCodeTitle, discountType, discountValue });
     res.json(result);
   } catch (error) {
     console.error("Error creating discount code:", error);
