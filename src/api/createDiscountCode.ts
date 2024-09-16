@@ -1,17 +1,13 @@
+import { DiscountCodePayload } from "./../../types/index";
 import { shopifyAPI } from "../shopify-api/shopify-api";
-import { discountPecentage } from "../utils";
+import { discountPercentage } from "../utils";
 
 export const createDiscountCode = async ({
   discountCode,
   discountCodeTitle,
   discountValue,
   discountType,
-}: {
-  discountCode: string;
-  discountCodeTitle: string;
-  discountValue: number;
-  discountType: string;
-}) => {
+}: DiscountCodePayload) => {
   try {
     const mutation = `
      mutation discountCodeBasicCreate($basicCodeDiscount: DiscountCodeBasicInput!) {
@@ -57,7 +53,7 @@ export const createDiscountCode = async ({
     }
     `;
 
-    const discount = discountType === "percentage" ? discountPecentage(discountValue) : discountValue;
+    const discount = discountType === "percentage" ? discountPercentage(discountValue) : discountValue;
 
     const mutationVariables = {
       basicCodeDiscount: {

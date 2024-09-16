@@ -1,4 +1,5 @@
 import { shopifyAPI } from "../shopify-api/shopify-api";
+import { Product } from "../../types";
 
 export const fetchProducts = async ({ first = 20, after = null, tags = [], title = "", category = "" }) => {
   const filters: string[] = [];
@@ -12,8 +13,8 @@ export const fetchProducts = async ({ first = 20, after = null, tags = [], title
   if (title) {
     filters.push(`title:*${title}*`);
   }
-
   filters.push(`published_status:published`);
+  filters.push(`variants.edges[0]?.node.inventoryQuantity:0`);
 
   const queryFilter = filters.length > 0 ? `(${filters.join(" AND ")})` : "";
 
@@ -60,7 +61,7 @@ export const fetchProducts = async ({ first = 20, after = null, tags = [], title
       return { message: "No products found", products: [], pageInfo: null };
     }
 
-    const filteredProducts = products.edges.map((product: any) => ({
+    const filteredProducts = products.edges.map((product: Product) => ({
       id: product.node.id,
       title: product.node.title,
       category: product.node.productType,
