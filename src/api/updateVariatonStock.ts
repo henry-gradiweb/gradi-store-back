@@ -1,4 +1,5 @@
 import { shopifyAPI } from "../shopify-api/shopify-api";
+import { updateVariantStockCodePayload } from "../../types";
 
 export const updateVariantStock = async ({
   variantId,
@@ -6,13 +7,7 @@ export const updateVariantStock = async ({
   locationId,
   name,
   reason,
-}: {
-  variantId: string;
-  newStock: number;
-  locationId: string;
-  name: string;
-  reason: string;
-}) => {
+}: updateVariantStockCodePayload) => {
   if (newStock < 0) {
     throw new Error("Stock value cannot be negative.");
   }
@@ -70,19 +65,19 @@ export const updateVariantStock = async ({
     `;
 
     const mutationVariables = {
-        reason: reason,
-        name: name,
-        changes: [
-          {
-            inventoryItemId: inventoryItemId,
-            locationId: locationId,
-            delta: newStock,
-          },
-        ],
+      reason: reason,
+      name: name,
+      changes: [
+        {
+          inventoryItemId: inventoryItemId,
+          locationId: locationId,
+          delta: newStock,
+        },
+      ],
     };
 
     const mutationResponse = await shopifyAPI.post("", { query: mutation, variables: { input: mutationVariables } });
-    
+
     const updatedInventory = mutationResponse.data.data?.inventoryAdjustQuantities?.inventoryAdjustmentGroup;
 
     if (updatedInventory === undefined) {
