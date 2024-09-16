@@ -58,7 +58,7 @@ app.post("/api/create-discount", async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error("Error creating discount code:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json(error);
   }
 });
 

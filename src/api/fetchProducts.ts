@@ -13,6 +13,8 @@ export const fetchProducts = async ({ first = 20, after = null, tags = [], title
     filters.push(`title:*${title}*`);
   }
 
+  filters.push(`published_status:published`);
+
   const queryFilter = filters.length > 0 ? `(${filters.join(" AND ")})` : "";
 
   const query = `

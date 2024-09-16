@@ -1,4 +1,5 @@
 import { shopifyAPI } from "../shopify-api/shopify-api";
+import { discountPecentage } from "../utils";
 
 export const createDiscountCode = async ({
   discountCode,
@@ -56,24 +57,26 @@ export const createDiscountCode = async ({
     }
     `;
 
+    const discount = discountType === "percentage" ? discountPecentage(discountValue) : discountValue;
+
     const mutationVariables = {
       basicCodeDiscount: {
-        "title": discountCodeTitle,
-        "code": discountCode,
-        "startsAt": "2022-06-21T00:00:00Z",
-        "endsAt": "2022-09-21T00:00:00Z",
-        "customerSelection": {
-          "all": true
+        title: discountCodeTitle,
+        code: discountCode,
+        startsAt: "2022-06-21T00:00:00Z",
+        endsAt: "2022-09-21T00:00:00Z",
+        customerSelection: {
+          all: true,
         },
-        "customerGets": {
-          "value": {
-            "percentage": discountValue
+        customerGets: {
+          value: {
+            percentage: discount,
           },
-          "items": {
-            "all": true
-          }
+          items: {
+            all: true,
+          },
         },
-        "appliesOncePerCustomer": true
+        appliesOncePerCustomer: true,
       },
     };
 
@@ -82,22 +85,25 @@ export const createDiscountCode = async ({
       variables: mutationVariables,
     });
 
-    console.log(response.data);
+    const userErrors = response.data.data?.discountCodeBasicCreate?.userErrors[0]?.message;
 
-    const userErrors = response.data.data?.discountCodeBasicCreate?.userErrors;
-    if (userErrors && userErrors.length > 0) {
-      console.error("Shopify User Errors:", userErrors);
-      throw new Error(userErrors.map((error: any) => `${error.field}: ${error.message}`).join(", "));
+    if (userErrors) {
+      return {
+        error: userErrors,
+      };
     }
 
-    const discountCodeData = response.data.data?.discountCodeBasicCreate?.codeDiscountNode?.codeDiscount;
+    const discountCodeData = response.data?.data.discountCodeBasicCreate;
+
     if (!discountCodeData) {
       throw new Error("No discount code data returned.");
     }
 
+    const createdCode = discountCodeData.codeDiscountNode.codeDiscount;
+
     return {
-      discountCode: discountCodeData.codes.nodes[0].code,
-      message: "Discount code created successfully.",
+      discountCode: createdCode,
+      message: `Discount code created successfully`,
     };
   } catch (error) {
     console.error("Error creating discount code:", error);
